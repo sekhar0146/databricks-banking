@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Databricks
+.databricks/
+*.dbc
+
+# dbt
+dbt_packages/
+target/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
