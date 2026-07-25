@@ -1,0 +1,13 @@
+database:
+  host: qa-db.example.com
+  port: 5432
+  name: qa_db
+  user: qa_user
+  password: qa_password
+
+storage:
+  bucket: qa-bucket
+
+settings:
+  debug: false
+  replicas: 2

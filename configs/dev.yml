@@ -1,0 +1,12 @@
+catalog: banking
+
+schemas:
+  bronze: bronze
+  silver: silver
+  gold: gold
+
+volumes:
+  landing: /Volumes/banking/bronze/landing_volume
+
+tables:
+  customer: customer_master
