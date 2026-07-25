@@ -1,9 +1,10 @@
 from src.common.config import load_config
 from src.common.logger import get_logger
 
+
 def main():
 
-    config = load_config("configs/dev.yml")
+    config = load_config()
 
     logger = get_logger(__name__)
 
@@ -18,6 +19,7 @@ def main():
     logger.info(f"Table         : {customer_table}")
 
     logger.info("Customer ingestion started")
+
 
 if __name__ == "__main__":
     main()
