@@ -9,7 +9,7 @@ volumes:
   landing: /Volumes/banking/bronze/landing_volume
 
 tables:
-  customer: customer_master
+  customer: customer_master_demo
 
 files:
   customer: customers.csv
