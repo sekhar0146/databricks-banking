@@ -3,6 +3,7 @@ from src.common.config import load_config
 from src.common.logger import get_logger
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
+from src.common.validation import validate_customer_data
 
 
 def main():
@@ -49,10 +50,13 @@ def main():
     df.show(5)
 
     logger.info(f"Source record count : {df.count()}")
+    good_df, bad_df = validate_customer_data(df)
+    logger.info(f"Good records : {good_df.count()}")
+    logger.info(f"Bad records  : {bad_df.count()}")
 
     # Write the data into the bronze schema as a Delta table
     (
-        df.write
+        good_df.write
             .format("delta")
             .mode("overwrite")
             .saveAsTable(f"{catalog}.{bronze_schema}.{customer_table}")
