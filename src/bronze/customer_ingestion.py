@@ -38,6 +38,18 @@ def main():
 
     df.show(5)
 
+    logger.info(f"Source record count : {df.count()}")
+
+    # Write the data into the bronze schema as a Delta table
+    (
+        df.write
+            .format("delta")
+            .mode("overwrite")
+            .saveAsTable(f"{catalog}.{bronze_schema}.{customer_table}")
+    )
+
+    logger.info(f"Loaded data into {catalog}.{bronze_schema}.{customer_table}")
+
 
 if __name__ == "__main__":
     main()
