@@ -2,6 +2,7 @@ from src.common import logger
 from src.common.config import load_config
 from src.common.logger import get_logger
 from pyspark.sql import SparkSession
+from pyspark.sql.types import *
 
 
 def main():
@@ -24,6 +25,14 @@ def main():
     logger.info("Customer ingestion started")
 
     # Read the customer data from the landing zone/ databricks volume
+    
+    customer_schema = StructType([
+    StructField("customer_id", IntegerType(), True),
+    StructField("customer_name", StringType(), True),
+    StructField("city", StringType(), True),
+    StructField("balance", DecimalType(10, 2), True)
+    ])
+
     file_name = config["files"]["customer"]
 
     file_path = f"{volume_path}/{file_name}"
@@ -32,10 +41,11 @@ def main():
 
     df = (
         spark.read
-             .option("header", "true")
-             .csv(file_path)
+        .option("header", "true")
+        .schema(customer_schema)
+        .csv(file_path)
     )
-
+    df.printSchema()
     df.show(5)
 
     logger.info(f"Source record count : {df.count()}")
