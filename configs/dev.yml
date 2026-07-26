@@ -10,3 +10,6 @@ volumes:
 
 tables:
   customer: customer_master
+
+files:
+  customer: customers.csv

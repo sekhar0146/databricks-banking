@@ -1,8 +1,11 @@
+from src.common import logger
 from src.common.config import load_config
 from src.common.logger import get_logger
+from pyspark.sql import SparkSession
 
 
 def main():
+    spark = SparkSession.builder.getOrCreate()
 
     config = load_config()
 
@@ -19,6 +22,21 @@ def main():
     logger.info(f"Table         : {customer_table}")
 
     logger.info("Customer ingestion started")
+
+    # Read the customer data from the landing zone/ databricks volume
+    file_name = config["files"]["customer"]
+
+    file_path = f"{volume_path}/{file_name}"
+
+    logger.info(f"Reading file : {file_path}")
+
+    df = (
+        spark.read
+             .option("header", "true")
+             .csv(file_path)
+    )
+
+    df.show(5)
 
 
 if __name__ == "__main__":
