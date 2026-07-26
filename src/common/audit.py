@@ -12,6 +12,7 @@ def create_pipeline_audit(
     good_records,
     bad_records,
     status,
+    created_by,
     error_message=""
 ):
 
@@ -27,7 +28,8 @@ def create_pipeline_audit(
         bad_records=bad_records,
         status=status,
         error_message=error_message,
-        created_by="databricks",
+        #created_by="databricks",
+        created_by=created_by,
         created_timestamp=datetime.now()
     )
 

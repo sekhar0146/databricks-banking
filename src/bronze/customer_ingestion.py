@@ -66,6 +66,8 @@ def main():
 
     logger.info(f"Loaded data into {catalog}.{bronze_schema}.{customer_table}")
 
+    current_user = spark.sql("SELECT current_user()").first()[0]
+
     audit_record = create_pipeline_audit(
         run_id=run_id,
         pipeline_name="customer_ingestion",
@@ -74,7 +76,8 @@ def main():
         total_records=df.count(),
         good_records=good_df.count(),
         bad_records=bad_df.count(),
-        status="SUCCESS"
+        status="SUCCESS",
+        created_by=current_user
     )
 
     save_pipeline_audit(audit_record)
