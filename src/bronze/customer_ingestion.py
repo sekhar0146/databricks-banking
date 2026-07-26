@@ -4,7 +4,8 @@ from src.common.logger import get_logger
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 from src.common.validation import validate_customer_data
-
+from datetime import datetime
+from src.common.audit import create_pipeline_audit, save_pipeline_audit
 
 def main():
     spark = SparkSession.builder.getOrCreate()
@@ -26,14 +27,15 @@ def main():
     logger.info("Customer ingestion started")
 
     # Read the customer data from the landing zone/ databricks volume
-    
+
     customer_schema = StructType([
-    StructField("customer_id", IntegerType(), True),
-    StructField("customer_name", StringType(), True),
-    StructField("city", StringType(), True),
-    StructField("balance", DecimalType(10, 2), True)
+        StructField("customer_id", IntegerType(), True),
+        StructField("customer_name", StringType(), True),
+        StructField("city", StringType(), True),
+        StructField("balance", DecimalType(10, 2), True)
     ])
 
+    run_id = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = config["files"]["customer"]
 
     file_path = f"{volume_path}/{file_name}"
@@ -42,9 +44,9 @@ def main():
 
     df = (
         spark.read
-        .option("header", "true")
-        .schema(customer_schema)
-        .csv(file_path)
+            .option("header", "true")
+            .schema(customer_schema)
+            .csv(file_path)
     )
     df.printSchema()
     df.show(5)
@@ -63,6 +65,21 @@ def main():
     )
 
     logger.info(f"Loaded data into {catalog}.{bronze_schema}.{customer_table}")
+
+    audit_record = create_pipeline_audit(
+        run_id=run_id,
+        pipeline_name="customer_ingestion",
+        source_file=file_name,
+        target_table=customer_table,
+        total_records=df.count(),
+        good_records=good_df.count(),
+        bad_records=bad_df.count(),
+        status="SUCCESS"
+    )
+
+    save_pipeline_audit(audit_record)
+
+    logger.info("Pipeline audit record inserted.")
 
 
 if __name__ == "__main__":
