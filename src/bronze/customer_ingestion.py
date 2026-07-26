@@ -6,6 +6,7 @@ from pyspark.sql.types import *
 from src.common.validation import validate_customer_data
 from datetime import datetime
 from src.common.audit import create_pipeline_audit, save_pipeline_audit
+from src.common.merge import merge_customer
 
 def main():
     spark = SparkSession.builder.getOrCreate()
@@ -57,14 +58,25 @@ def main():
     logger.info(f"Bad records  : {bad_df.count()}")
 
     # Write the data into the bronze schema as a Delta table
-    (
-        good_df.write
-            .format("delta")
-            .mode("overwrite")
-            .saveAsTable(f"{catalog}.{bronze_schema}.{customer_table}")
+    # (
+    #     good_df.write
+    #         .format("delta")
+    #         .mode("overwrite")
+    #         .saveAsTable(f"{catalog}.{bronze_schema}.{customer_table}")
+    # )
+
+    # logger.info(f"Loaded data into {catalog}.{bronze_schema}.{customer_table}")
+
+    # Merge the good records into the target Delta table
+    target_table = f"{catalog}.{bronze_schema}.{customer_table}"
+    
+    merge_customer(
+        spark,
+        good_df,
+        target_table
     )
 
-    logger.info(f"Loaded data into {catalog}.{bronze_schema}.{customer_table}")
+    logger.info(f"Merged data into {target_table}")
 
     current_user = spark.sql("SELECT current_user()").first()[0]
 
